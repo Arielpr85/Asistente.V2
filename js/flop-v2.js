@@ -160,6 +160,7 @@ export function calcularPostflopV2() {
     flopAction: null,
     flopSize: null,
     flopPlan: null,
+    xrOutcome: "UNKNOWN",
 
     heroCompletedDraw: false,
     boardCompletedDraw: false,
@@ -196,6 +197,7 @@ export function calcularPostflopV2() {
     flopAction: act.action,
     flopSize: act.size ?? null,
     flopPlan: act.plan ?? "NONE",
+    xrOutcome: "UNKNOWN",
 
     // ✅ NUEVO: lo que ui-v2.js busca (flopAdvice)
     flopAdvice: {
@@ -218,5 +220,4 @@ export function initFlopV2() {
     el?.addEventListener("change", () => calcularPostflopV2());
   });
 }
-
 

@@ -125,4 +125,3 @@ export function notifyStateChange() {
 // state-v2.js (al final)
 window.AppState = AppState;
 
-

@@ -38,23 +38,30 @@ function getVillainProfile() {
   return "DEFAULT";
 }
 
-function computeTurnDynamic(pos, flop3, turnCard) {
+function handTierValue(tier) {
+  if (tier === "MUY_FUERTE") return 3;
+  if (tier === "FUERTE") return 2;
+  if (tier === "MEDIA") return 1;
+  return 0;
+}
+
+function computeTurnDynamic(heroCards, flop3, turnCard) {
   // JSON: "STATIC" | "AGGRESSOR" | "DEFENDER"
   if (!flop3 || flop3.length !== 3 || !turnCard?.rank) return "STATIC";
 
-  const flopRanks = flop3.map((c) => c.rank);
+  const flopSnapshot = buildHandSnapshot(heroCards, flop3);
+  const turnSnapshot = buildHandSnapshot(heroCards, [...flop3, turnCard]);
 
-  const isOvercard =
-    ["A", "K", "Q"].includes(turnCard.rank) &&
-    !flopRanks.includes(turnCard.rank);
+  const flopTier = handTierValue(snapshotToHandTier(flopSnapshot));
+  const turnTier = handTierValue(snapshotToHandTier(turnSnapshot));
+  const tierDelta = turnTier - flopTier;
 
-  const isPairingBoard = flopRanks.includes(turnCard.rank);
+  const flopOuts = Number.isFinite(flopSnapshot?.outs) ? flopSnapshot.outs : 0;
+  const turnOuts = Number.isFinite(turnSnapshot?.outs) ? turnSnapshot.outs : 0;
+  const outsDelta = turnOuts - flopOuts;
 
-  // Heurística simple y estable:
-  // - Overcards grandes y pares suelen favorecer al agresor (más presión percibida).
-  // - Si no, lo dejamos STATIC (neutral) para no inventar DEFENDER sin lógica sólida.
-  if (isOvercard || isPairingBoard) return "AGGRESSOR";
-
+  if (tierDelta > 0 || outsDelta > 0) return "AGGRESSOR";
+  if (tierDelta < 0 || outsDelta < 0) return "DEFENDER";
   return "STATIC";
 }
 
@@ -227,11 +234,7 @@ export function calcularTurnV2() {
   const handTier = snapshotToHandTier(snapshotTurn);
   const outs = calcOutsFromSnapshot(snapshotTurn);
 
-  const turnDynamic = computeTurnDynamic(
-    flopCtx.pos || "IP",
-    flopCtx.flop,
-    turn,
-  );
+  const turnDynamic = computeTurnDynamic(hero, flopCtx.flop, turn);
   const boardCompletedDraw = didBoardCompleteFlush(flopCtx.flop, turn);
   const heroCompletedDraw = didHeroCompleteDraw(snapshotTurn);
   const blockers = blockersFromSnapshot(snapshotTurn);
@@ -249,6 +252,12 @@ export function calcularTurnV2() {
     flopAction: flopCtx.flopAction || flopCtx?.flopAdvice?.action || null,
     flopSize: flopCtx.flopSize ?? flopCtx?.flopAdvice?.size ?? null,
     flopPlan: flopCtx.flopPlan || flopCtx?.flopAdvice?.plan || "NONE",
+    xrOutcome:
+      flopCtx.xrOutcome && flopCtx.xrOutcome !== "UNKNOWN"
+        ? flopCtx.xrOutcome
+        : ["XR", "XR_SEMI"].includes(flopCtx.flopPlan || "")
+          ? "FAIL"
+          : "UNKNOWN",
 
     turnDynamic,
     heroCompletedDraw,
@@ -334,6 +343,7 @@ export function calcularTurnV2() {
     turnDynamic,
     heroCompletedDraw,
     boardCompletedDraw,
+    xrOutcome: engineCtx.xrOutcome || "UNKNOWN",
 
     // advice
     action: act.action,

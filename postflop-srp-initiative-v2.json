@@ -194,14 +194,20 @@
             "all": [
               { "eq": ["boardType", "PAREADO_DEFENSIVO"] },
               { "eq": ["villainProfile", "GOOD"] },
-              { "in": ["handTier", ["MUY_FUERTE", "FUERTE"]] }
+              {
+                "any": [
+                  { "in": ["handTier", ["MUY_FUERTE", "FUERTE"]] },
+                  { "eq": ["handTier", "AIRE"] },
+                  { "gte": ["outs", 8] }
+                ]
+              }
             ]
           },
           "do": {
             "action": "BET",
             "size": 33,
             "plan": "CBET_VALUE",
-            "reason": "Pareado defensivo vs bueno: bet chico con fuertes"
+            "reason": "Pareado defensivo vs bueno: bet chico con fuertes, aire o semifarol 8+ outs"
           }
         },
         {
@@ -216,7 +222,7 @@
           "do": {
             "action": "CHECK",
             "plan": "CHECK_BACK",
-            "reason": "Pareado defensivo vs bueno: check con medias/aire"
+            "reason": "Pareado defensivo vs bueno: check con medias/SD"
           }
         },
 
@@ -331,14 +337,14 @@
           "when": {
             "all": [
               { "eq": ["boardType", "OFENSIVO_COORD"] },
-              { "eq": ["flopWentCheckCheck", true] }
+              { "eq": ["flopAction", "CHECK"] }
             ]
           },
           "do": {
             "action": "BET",
             "size": 75,
             "plan": "DELAYED_CBET",
-            "reason": "Ofensivo coordinado: doble check -> podemos apostar cualquier turn"
+            "reason": "Ofensivo coordinado: check flop -> podemos apostar cualquier turn"
           }
         },
 
@@ -386,22 +392,6 @@
           }
         },
 
-        {
-          "id": "IP_T_DYNAMIC_DEFENDER_STRONG",
-          "priority": 60,
-          "when": {
-            "all": [
-              { "eq": ["turnDynamic", "DEFENDER"] },
-              { "in": ["handTier", ["FUERTE", "MUY_FUERTE"]] }
-            ]
-          },
-          "do": {
-            "action": "BET",
-            "size": 50,
-            "plan": "VALUE_PROTECT",
-            "reason": "Turn dinámico favorece al defensor: valor/protección"
-          }
-        },
         {
           "id": "IP_T_DYNAMIC_DEFENDER_CHECK",
           "priority": 61,
@@ -453,6 +443,102 @@
             "action": "CHECK",
             "plan": "CONTROL",
             "reason": "Turn: se completa draw del board -> frenar con rango vulnerable"
+          }
+        },
+
+        {
+          "id": "IP_T_PAIRED_FROM_33_STRONG_OR_SEMI",
+          "priority": 82,
+          "when": {
+            "all": [
+              {
+                "in": [
+                  "boardType",
+                  ["PAREADO_OFENSIVO", "PAREADO_DEFENSIVO", "PAREADO_NEUTRO"]
+                ]
+              },
+              { "eq": ["flopSize", 33] },
+              {
+                "any": [
+                  { "in": ["handTier", ["MUY_FUERTE", "FUERTE"]] },
+                  { "gte": ["outs", 4] }
+                ]
+              }
+            ]
+          },
+          "do": {
+            "action": "BET",
+            "size": 50,
+            "plan": "VALUE_OR_SEMI",
+            "reason": "Pareado turn (flop 33%): bet 50% con fuerte o semifarol"
+          }
+        },
+        {
+          "id": "IP_T_PAIRED_FROM_33_CHECK",
+          "priority": 83,
+          "when": {
+            "all": [
+              {
+                "in": [
+                  "boardType",
+                  ["PAREADO_OFENSIVO", "PAREADO_DEFENSIVO", "PAREADO_NEUTRO"]
+                ]
+              },
+              { "eq": ["flopSize", 33] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Pareado turn (flop 33%): check cuando el valor no es muy fuerte"
+          }
+        },
+
+        {
+          "id": "IP_T_PAIRED_FROM_50_STRONG_OR_SEMI",
+          "priority": 84,
+          "when": {
+            "all": [
+              {
+                "in": [
+                  "boardType",
+                  ["PAREADO_OFENSIVO", "PAREADO_DEFENSIVO", "PAREADO_NEUTRO"]
+                ]
+              },
+              { "eq": ["flopSize", 50] },
+              {
+                "any": [
+                  { "in": ["handTier", ["MUY_FUERTE", "FUERTE"]] },
+                  { "gte": ["outs", 8] }
+                ]
+              }
+            ]
+          },
+          "do": {
+            "action": "BET",
+            "size": 50,
+            "plan": "VALUE_OR_SEMI",
+            "reason": "Pareado turn (flop 50%): bet 50% con fuerte o semifarol 8+ outs"
+          }
+        },
+        {
+          "id": "IP_T_PAIRED_FROM_50_CHECK",
+          "priority": 85,
+          "when": {
+            "all": [
+              {
+                "in": [
+                  "boardType",
+                  ["PAREADO_OFENSIVO", "PAREADO_DEFENSIVO", "PAREADO_NEUTRO"]
+                ]
+              },
+              { "eq": ["flopSize", 50] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Pareado turn (flop 50%): check cuando el valor no es muy fuerte"
           }
         },
 
@@ -611,33 +697,6 @@
             "action": "CHECK_FOLD",
             "plan": "XF",
             "reason": "OOP: aire sin equity -> check/fold"
-          }
-        },
-
-        {
-          "id": "OOP_F_PAIRED_MONO_SIMPLIFY",
-          "priority": 25,
-          "when": {
-            "all": [
-              {
-                "in": [
-                  "boardType",
-                  [
-                    "PAREADO_OFENSIVO",
-                    "PAREADO_DEFENSIVO",
-                    "PAREADO_NEUTRO",
-                    "MONOCOLOR"
-                  ]
-                ]
-              },
-              { "in": ["handTier", ["FUERTE", "MEDIA"]] }
-            ]
-          },
-          "do": {
-            "action": "BET",
-            "size": 33,
-            "plan": "SIMPLIFY",
-            "reason": "OOP (simplificado): pareado/monocolor -> bet chico con fuerte/media"
           }
         },
 
@@ -859,5 +918,3 @@
     }
   }
 }
-
-
