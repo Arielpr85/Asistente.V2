@@ -1,0 +1,1184 @@
+{
+  "gameInfo": {
+    "game": "NL5",
+    "stakes": "0.02/0.05",
+    "tableType": "9max",
+    "style": "TAG explotativo",
+    "description": "Rangos preflop explotativos para NL5 online, hasta 4bet."
+  },
+  "legend": {
+    "openRaise": "Open raise estándar",
+    "openLimp": "Limp sin acción previa",
+    "overLimp": "Limp después de uno o más limpers",
+    "isoRaise": "Raise para aislar limpers",
+    "call": "Call / cold call",
+    "threeBet": "3bet",
+    "fourBet": "4bet (por valor o shove)"
+  },
+  "positions": {
+    "UTG": {
+      "firstIn": {
+        "openRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "QJs",
+          "JTs",
+          "AKo",
+          "AQo"
+        ],
+        "openLimp": []
+      },
+      "overLimp": {
+        "overLimp": [],
+        "isoRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "QJs",
+          "QTs",
+          "JTs",
+          "AKo",
+          "AQo",
+          "AJo",
+          "KQo"
+        ]
+      },
+      "vsOpen": {
+        "default": {
+          "call": [],
+          "threeBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "JJ",
+            "TT",
+            "AKs",
+            "AQs",
+            "KQs",
+            "AKo",
+            "AQo"
+          ]
+        },
+        "vsUTG": {
+          "call": [],
+          "threeBet": []
+        }
+      },
+      "vs3bet": {
+        "default": {
+          "call": [
+            "JJ",
+            "TT",
+            "99",
+            "88",
+            "77",
+            "66",
+            "AJs",
+            "ATs"
+          ],
+          "fourBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "AKs",
+            "AQs",
+            "AKo"
+          ]
+        }
+      }
+    },
+    "MP": {
+      "firstIn": {
+        "openRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "66",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "A5s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "QJs",
+          "QTs",
+          "JTs",
+          "AKo",
+          "AQo",
+          "AJo",
+          "KQo"
+        ],
+        "openLimp": []
+      },
+      "overLimp": {
+        "overLimp": [],
+        "isoRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "QJs",
+          "QTs",
+          "JTs",
+          "AKo",
+          "AQo",
+          "AJo",
+          "KQo"
+        ]
+      },
+      "vsOpen": {
+        "default": {
+          "call": [],
+          "threeBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "JJ",
+            "TT",
+            "AKs",
+            "AQs",
+            "KQs",
+            "AKo",
+            "AQo"
+          ]
+        },
+        "vsMP": {
+          "call": [],
+          "threeBet": []
+        }
+      },
+      "vs3bet": {
+        "default": {
+          "call": [
+            "JJ",
+            "TT",
+            "99",
+            "88",
+            "77",
+            "66",
+            "AJs",
+            "ATs"
+          ],
+          "fourBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "AKs",
+            "AQs",
+            "AKo"
+          ]
+        }
+      }
+    },
+    "HJ": {
+      "firstIn": {
+        "openRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "66",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "A5s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "QJs",
+          "QTs",
+          "JTs",
+          "T9s",
+          "AKo",
+          "AQo",
+          "AJo",
+          "KQo",
+          "KJo"
+        ],
+        "openLimp": []
+      },
+      "overLimp": {
+        "overLimp": [],
+        "isoRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "QJs",
+          "QTs",
+          "JTs",
+          "T9s",
+          "AKo",
+          "AQo",
+          "AJo",
+          "ATo",
+          "KQo",
+          "KJo",
+          "KTo",
+          "QJo",
+          "QTo",
+          "JTo"
+        ]
+      },
+      "vsOpen": {
+        "default": {
+          "call": [],
+          "threeBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "JJ",
+            "TT",
+            "AKs",
+            "AQs",
+            "KQs",
+            "AKo",
+            "AQo"
+          ]
+        },
+        "vsHJ": {
+          "call": [],
+          "threeBet": []
+        }
+      },
+      "vs3bet": {
+        "default": {
+          "call": [
+            "JJ",
+            "TT",
+            "99",
+            "88",
+            "77",
+            "66",
+            "AJs",
+            "ATs"
+          ],
+          "fourBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "AKs",
+            "AQs",
+            "AKo"
+          ]
+        },
+        "vsHJ": {
+          "call": [],
+          "fourBet": []
+        }
+      }
+    },
+    "CO": {
+      "firstIn": {
+        "openRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "66",
+          "55",
+          "44",
+          "33",
+          "22",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "A8s",
+          "A7s",
+          "A6s",
+          "A5s",
+          "A4s",
+          "A3s",
+          "A2s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "K9s",
+          "QJs",
+          "QTs",
+          "Q9s",
+          "JTs",
+          "J9s",
+          "T9s",
+          "98s",
+          "87s",
+          "76s",
+          "65s",
+          "AKo",
+          "AQo",
+          "AJo",
+          "ATo",
+          "KQo",
+          "KJo",
+          "KTo",
+          "QJo",
+          "QTo",
+          "JTo"
+        ],
+        "openLimp": []
+      },
+      "overLimp": {
+        "overLimp": [],
+        "isoRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "QJs",
+          "QTs",
+          "JTs",
+          "T9s",
+          "AKo",
+          "AQo",
+          "AJo",
+          "ATo",
+          "KQo",
+          "KJo",
+          "KTo",
+          "QJo",
+          "QTo",
+          "JTo"
+        ]
+      },
+      "vsOpen": {
+        "default": {
+          "call": [],
+          "threeBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "JJ",
+            "TT",
+            "AKs",
+            "AQs",
+            "KQs",
+            "AKo",
+            "AQo"
+          ]
+        },
+        "vsCO": {
+          "call": [],
+          "threeBet": []
+        }
+      },
+      "vs3bet": {
+        "default": {
+          "call": [
+            "JJ",
+            "TT",
+            "99",
+            "88",
+            "77",
+            "66",
+            "AJs",
+            "ATs"
+          ],
+          "fourBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "AKs",
+            "AQs",
+            "AKo"
+          ]
+        },
+        "vsCO": {
+          "call": [],
+          "fourBet": []
+        }
+      }
+    },
+    "BTN": {
+      "firstIn": {
+        "openRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "66",
+          "55",
+          "44",
+          "33",
+          "22",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "A8s",
+          "A7s",
+          "A6s",
+          "A5s",
+          "A4s",
+          "A3s",
+          "A2s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "K9s",
+          "K8s",
+          "K7s",
+          "K6s",
+          "K5s",
+          "QJs",
+          "QTs",
+          "Q9s",
+          "Q8s",
+          "JTs",
+          "J9s",
+          "J8s",
+          "T9s",
+          "T8s",
+          "98s",
+          "97s",
+          "87s",
+          "86s",
+          "76s",
+          "75s",
+          "65s",
+          "64s",
+          "54s",
+          "AKo",
+          "AQo",
+          "AJo",
+          "ATo",
+          "A9o",
+          "A8o",
+          "KQo",
+          "KJo",
+          "KTo",
+          "K9o",
+          "QJo",
+          "QTo",
+          "JTo",
+          "T9o"
+        ],
+        "openLimp": []
+      },
+      "overLimp": {
+        "overLimp": [
+          "66",
+          "55",
+          "44",
+          "33",
+          "22",
+          "A8s",
+          "A7s",
+          "A6s",
+          "A5s",
+          "A4s",
+          "A3s",
+          "A2s"
+        ],
+        "isoRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "QJs",
+          "QTs",
+          "JTs",
+          "T9s",
+          "AKo",
+          "AQo",
+          "AJo",
+          "ATo",
+          "KQo",
+          "KJo",
+          "KTo",
+          "QJo",
+          "QTo",
+          "JTo"
+        ]
+      },
+      "vsOpen": {
+        "default": {
+          "call": [
+            "99",
+            "88",
+            "77",
+            "66",
+            "55",
+            "44",
+            "33",
+            "22",
+            "AJs",
+            "ATs",
+            "A9s",
+            "A8s",
+            "A7s",
+            "A6s",
+            "A5s",
+            "A4s",
+            "A3s",
+            "A2s"
+          ],
+          "threeBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "JJ",
+            "TT",
+            "AKs",
+            "AQs",
+            "KQs",
+            "AKo",
+            "AQo"
+          ]
+        },
+        "vsHJ": {
+          "call": [
+            "99",
+            "88",
+            "77",
+            "66",
+            "55",
+            "44",
+            "33",
+            "22",
+            "A9s",
+            "A8s",
+            "A7s",
+            "A6s",
+            "A5s",
+            "A4s",
+            "A3s",
+            "A2s"
+          ],
+          "threeBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "JJ",
+            "TT",
+            "AKs",
+            "AQs",
+            "AJs",
+            "ATs",
+            "KQs",
+            "AKo",
+            "AQo",
+            "AJo"
+          ]
+        },
+        "vsCO": {
+          "call": [
+            "99",
+            "88",
+            "77",
+            "66",
+            "55",
+            "44",
+            "33",
+            "22",
+            "A9s",
+            "A8s",
+            "A7s",
+            "A6s",
+            "A5s",
+            "A4s",
+            "A3s",
+            "A2s"
+          ],
+          "threeBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "JJ",
+            "TT",
+            "AKs",
+            "AQs",
+            "AJs",
+            "ATs",
+            "KQs",
+            "AKo",
+            "AQo",
+            "AJo"
+          ]
+        }
+      },
+      "vs3bet": {
+        "default": {
+          "call": [
+            "JJ",
+            "TT",
+            "99",
+            "88",
+            "77",
+            "66",
+            "AJs",
+            "ATs",
+            "KQs",
+            "QJs",
+            "JTs",
+            "AQo"
+          ],
+          "fourBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "AKs",
+            "AQs",
+            "AKo"
+          ]
+        }
+      }
+    },
+    "SB": {
+      "firstIn": {
+        "openRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "66",
+          "55",
+          "44",
+          "33",
+          "22",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "A8s",
+          "A7s",
+          "A6s",
+          "A5s",
+          "A4s",
+          "A3s",
+          "A2s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "K9s",
+          "QJs",
+          "QTs",
+          "Q9s",
+          "JTs",
+          "J9s",
+          "T9s",
+          "98s",
+          "87s",
+          "76s",
+          "65s",
+          "AKo",
+          "AQo",
+          "AJo",
+          "ATo",
+          "KQo",
+          "KJo",
+          "KTo",
+          "QJo",
+          "QTo",
+          "JTo"
+        ],
+        "openLimp": []
+      },
+      "overLimp": {
+        "overLimp": [
+          "99",
+          "88",
+          "77",
+          "66",
+          "55",
+          "44",
+          "33",
+          "22",
+          "A9s",
+          "A8s",
+          "A7s",
+          "A6s",
+          "A5s",
+          "A4s",
+          "A3s",
+          "A2s",
+          "KJs",
+          "KTs",
+          "K9s",
+          "QJs",
+          "QTs",
+          "Q9s",
+          "JTs",
+          "J9s",
+          "T9s",
+          "98s",
+          "87s",
+          "76s",
+          "65s",
+          "AJo",
+          "ATo",
+          "KJo",
+          "KTo",
+          "QJo",
+          "QTo",
+          "JTo"
+        ],
+        "isoRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "KQs",
+          "AKo",
+          "AQo",
+          "KQo"
+        ]
+      },
+      "vsOpen": {
+        "default": {
+          "call": [
+            "99",
+            "88",
+            "77",
+            "66",
+            "55",
+            "44",
+            "33",
+            "22",
+            "A9s",
+            "A8s",
+            "A7s",
+            "A6s",
+            "A5s",
+            "A4s",
+            "A3s",
+            "A2s",
+            "KJs",
+            "KTs",
+            "QJs",
+            "QTs",
+            "JTs"
+          ],
+          "threeBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "JJ",
+            "TT",
+            "AKs",
+            "AQs",
+            "AJs",
+            "ATs",
+            "KQs",
+            "AKo",
+            "AQo",
+            "KQo"
+          ]
+        }
+      },
+      "vs3bet": {
+        "default": {
+          "call": [
+            "JJ",
+            "TT",
+            "99",
+            "88",
+            "77",
+            "66",
+            "AJs",
+            "ATs"
+          ],
+          "fourBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "AKs",
+            "AQs",
+            "AKo"
+          ]
+        }
+      }
+    },
+    "BB": {
+      "firstIn": {
+        "openRaise": [],
+        "openLimp": []
+      },
+      "overLimp": {
+        "overLimp": [],
+        "isoRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "66",
+          "55",
+          "44",
+          "33",
+          "22",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "A8s",
+          "A7s",
+          "A6s",
+          "A5s",
+          "A4s",
+          "A3s",
+          "A2s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "K9s",
+          "K8s",
+          "K7s",
+          "K6s",
+          "K5s",
+          "QJs",
+          "QTs",
+          "Q9s",
+          "Q8s",
+          "JTs",
+          "J9s",
+          "J8s",
+          "T9s",
+          "T8s",
+          "98s",
+          "97s",
+          "87s",
+          "86s",
+          "76s",
+          "75s",
+          "65s",
+          "64s",
+          "54s",
+          "AKo",
+          "AQo",
+          "AJo",
+          "ATo",
+          "A9o",
+          "A8o",
+          "A7o",
+          "A6o",
+          "A5o",
+          "KQo",
+          "KJo",
+          "KTo",
+          "K9o",
+          "QJo",
+          "QTo",
+          "JTo",
+          "T9o"
+        ]
+      },
+      "vsOpen": {
+        "default": {
+          "call": [
+            "99",
+            "88",
+            "77",
+            "66",
+            "55",
+            "44",
+            "33",
+            "22",
+            "A9s",
+            "A8s",
+            "A7s",
+            "A6s",
+            "A5s",
+            "A4s",
+            "A3s",
+            "A2s",
+            "KJs",
+            "KTs",
+            "K9s",
+            "K8s",
+            "K7s",
+            "K6s",
+            "K5s",
+            "QJs",
+            "QTs",
+            "Q9s",
+            "Q8s",
+            "JTs",
+            "J9s",
+            "J8s",
+            "T9s",
+            "T8s",
+            "98s",
+            "97s",
+            "87s",
+            "86s",
+            "76s",
+            "75s",
+            "65s",
+            "64s",
+            "54s",
+            "AJo",
+            "ATo",
+            "A9o",
+            "A8o",
+            "A7o",
+            "A6o",
+            "A5o",
+            "KJo",
+            "KTo",
+            "K9o",
+            "QJo",
+            "QTo",
+            "JTo",
+            "T9o"
+          ],
+          "threeBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "JJ",
+            "TT",
+            "AKs",
+            "AQs",
+            "AJs",
+            "ATs",
+            "KQs",
+            "AKo",
+            "AQo",
+            "KQo"
+          ]
+        },
+        "vsBB": {
+          "call": [],
+          "threeBet": []
+        }
+      },
+      "vs3bet": {
+        "default": {
+          "call": [
+            "JJ",
+            "TT",
+            "99",
+            "88",
+            "77",
+            "66",
+            "AJs",
+            "ATs"
+          ],
+          "fourBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "AKs",
+            "AQs",
+            "AKo"
+          ]
+        }
+      }
+    },
+    "UTG1": {
+      "firstIn": {
+        "openRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "QJs",
+          "QTs",
+          "JTs",
+          "AKo",
+          "AQo",
+          "AJo",
+          "KQo"
+        ],
+        "openLimp": []
+      },
+      "overLimp": {
+        "overLimp": [],
+        "isoRaise": [
+          "AA",
+          "KK",
+          "QQ",
+          "JJ",
+          "TT",
+          "99",
+          "88",
+          "77",
+          "AKs",
+          "AQs",
+          "AJs",
+          "ATs",
+          "A9s",
+          "KQs",
+          "KJs",
+          "KTs",
+          "QJs",
+          "QTs",
+          "JTs",
+          "AKo",
+          "AQo",
+          "AJo",
+          "KQo"
+        ]
+      },
+      "vsOpen": {
+        "default": {
+          "call": [],
+          "threeBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "JJ",
+            "TT",
+            "AKs",
+            "AQs",
+            "KQs",
+            "AKo",
+            "AQo"
+          ]
+        },
+        "vsUTG1": {
+          "call": [],
+          "threeBet": []
+        }
+      },
+      "vs3bet": {
+        "default": {
+          "call": [
+            "JJ",
+            "TT",
+            "99",
+            "88",
+            "77",
+            "66",
+            "AJs",
+            "ATs"
+          ],
+          "fourBet": [
+            "AA",
+            "KK",
+            "QQ",
+            "AKs",
+            "AQs",
+            "AKo"
+          ]
+        }
+      }
+    }
+  }
+}
