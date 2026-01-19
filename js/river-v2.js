@@ -68,6 +68,10 @@ export function calcularRiverV2() {
     flopAction: flopCtx.flopAction || flopCtx?.flopAdvice?.action || null,
     flopSize: flopCtx.flopSize ?? flopCtx?.flopAdvice?.size ?? null,
     flopPlan: flopCtx.flopPlan || flopCtx?.flopAdvice?.plan || "NONE",
+    xrOutcome:
+      turnCtx.xrOutcome && turnCtx.xrOutcome !== "UNKNOWN"
+        ? turnCtx.xrOutcome
+        : flopCtx.xrOutcome || "UNKNOWN",
 
     // memoria del turn (en JSON se usa en turn, pero lo dejamos por consistencia)
     turnDynamic: turnCtx.turnDynamic || "STATIC",
@@ -107,6 +111,7 @@ export function calcularRiverV2() {
     boardType,
     pos: ctx.pos,
     handTier,
+    xrOutcome: ctx.xrOutcome || "UNKNOWN",
 
     action: act.action,
     size: act.size ?? null,

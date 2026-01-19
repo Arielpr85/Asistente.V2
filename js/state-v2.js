@@ -93,6 +93,14 @@ export function normalizeTurnDynamic(v) {
   return "";
 }
 
+// xrOutcome: UNKNOWN | SUCCESS | FAIL
+export function normalizeXrOutcome(v) {
+  const x = String(v || "").toUpperCase().trim();
+  if (x === "SUCCESS") return "SUCCESS";
+  if (x === "FAIL") return "FAIL";
+  return "UNKNOWN";
+}
+
 // ========= State change helpers (para módulos como river/turn/flop) =========
 const _listeners = new Set();
 
@@ -116,5 +124,4 @@ export function notifyStateChange() {
 
 // state-v2.js (al final)
 window.AppState = AppState;
-
 
