@@ -787,3 +787,94 @@ export function runPostflopTestsV2({ showAll = true } = {}) {
 
 // Por comodidad desde consola:
 window.runPostflopTestsV2 = runPostflopTestsV2;
+
+// ===============================
+// ✅ RUNNER ESPECÍFICO (CON CARTAS REALES)
+// Usa buildHandSnapshot + classifyFlopToBoardType
+// ===============================
+export function runCardScenarioTestsV2({ showAll = true } = {}) {
+  requireRulesLoaded();
+
+  if (typeof window.buildHandSnapshot !== "function") {
+    throw new Error("[tests] buildHandSnapshot no está disponible en window.");
+  }
+  if (typeof window.classifyFlopToBoardType !== "function") {
+    throw new Error("[tests] classifyFlopToBoardType no está disponible en window.");
+  }
+
+  const c = (rank, suit) => ({ rank, suit });
+
+  const scenarios = [
+    {
+      name: "IP RIVER: QJ con river J -> par de J (media) = CHECK",
+      pos: "IP",
+      hero: [c("Q", "s"), c("J", "h")],
+      flop: [c("9", "d"), c("7", "d"), c("8", "d")],
+      turn: c("5", "d"),
+      river: c("J", "c"),
+      expected: { action: "CHECK" },
+    },
+    {
+      name: "IP RIVER: QJ con river Q -> par de Q (fuerte) = BET 75",
+      pos: "IP",
+      hero: [c("Q", "s"), c("J", "h")],
+      flop: [c("9", "d"), c("7", "d"), c("8", "d")],
+      turn: c("5", "d"),
+      river: c("Q", "c"),
+      expected: { action: "BET", size: 75 },
+    },
+  ];
+
+  const rows = [];
+  let pass = 0;
+  let fail = 0;
+
+  for (const sc of scenarios) {
+    const board = [...sc.flop, sc.turn, sc.river];
+    const snap = window.buildHandSnapshot(sc.hero, board);
+    const boardType = window.classifyFlopToBoardType(sc.flop);
+
+    const ctx = {
+      pos: sc.pos,
+      street: "RIVER",
+      boardType,
+      handTier: snap.handTier,
+      outs: snap.outs,
+      villainProfile: "DEFAULT",
+      flopAction: "BET",
+      flopSize: 33,
+      flopPlan: "CBET_RANGE",
+      turnDynamic: "STATIC",
+      heroCompletedDraw: false,
+      boardCompletedDraw: false,
+      hasBlockersForBluff: snap.hasBlockersForBluff,
+    };
+
+    const act = pickPostflopActionV2(AppState.postflopRules, ctx);
+    const res = matchExpected(act, sc.expected);
+    const ok = res.ok;
+
+    if (ok) pass++;
+    else fail++;
+
+    rows.push({
+      ok: ok ? "✅" : "❌",
+      name: sc.name,
+      handTier: snap.handTier,
+      expected_action: sc.expected.action ?? "",
+      got_action: act.action ?? "",
+      expected_size: sc.expected.size ?? "",
+      got_size: act.size ?? "",
+      why: ok ? "" : res.why,
+    });
+  }
+
+  const toShow = showAll ? rows : rows.filter((r) => r.ok === "❌");
+  console.table(toShow);
+  console.log(
+    `[card-tests-v2] Total: ${scenarios.length} | PASS: ${pass} | FAIL: ${fail}`
+  );
+  return { total: scenarios.length, pass, fail, rows };
+}
+
+window.runCardScenarioTestsV2 = runCardScenarioTestsV2;
