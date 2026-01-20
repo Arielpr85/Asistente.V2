@@ -162,6 +162,9 @@ export function buildHandSnapshot(heroCards, boardCards) {
   // cap para no irnos a cualquier cosa (ej FD+OESD = 17 es válido)
   if (outs > 17) outs = 17;
 
+  const isRiver = (boardCards || []).length >= 5;
+  if (isRiver) outs = 0;
+
   // ---------------------------
   // 3) Blockers para bluff (heurístico simple)
   // Para empezar: si tenemos A o K como high card (o en la mano) lo tratamos como blocker.
@@ -169,7 +172,8 @@ export function buildHandSnapshot(heroCards, boardCards) {
   // ---------------------------
   const heroRanks = (heroCards || []).map((c) => c?.rank).filter(Boolean);
   const hasHighBlocker = heroRanks.includes("A") || heroRanks.includes("K");
-  const hasBlockersForBluff = handTier === "AIRE" && (hasHighBlocker || outs >= 4);
+  const hasBlockersForBluff =
+    handTier === "AIRE" && (hasHighBlocker || (!isRiver && outs >= 4));
 
   return {
     handTier,
@@ -181,6 +185,5 @@ export function buildHandSnapshot(heroCards, boardCards) {
     flags,
   };
 }
-
 
 
