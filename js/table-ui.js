@@ -139,6 +139,26 @@
   document.addEventListener("cards:cleared", () => {
     Object.keys(state).forEach((k) => (state[k] = null));
 
+    const tl = document.getElementById("u_turn_line");
+    const te = document.getElementById("u_turn_expl");
+    const ta = document.getElementById("u_turn_badge");
+    if (tl) tl.textContent = "Esperando flop + carta turn.";
+    if (te) te.textContent = "—";
+    if (ta) {
+      ta.textContent = "—";
+      ta.className = "badge badge-check mt-2";
+    }
+
+    const turnBoardText = document.getElementById("turnBoardText");
+    const turnExplanation = document.getElementById("turnExplanation");
+    const turnActionBadge = document.getElementById("turnActionBadge");
+    if (turnBoardText) turnBoardText.textContent = "Board turn: —";
+    if (turnExplanation) turnExplanation.textContent = "—";
+    if (turnActionBadge) {
+      turnActionBadge.textContent = "—";
+      turnActionBadge.className = "badge badge-check";
+    }
+
     const rl = document.getElementById("u_river_line");
     const rc = document.getElementById("u_river_context");
     const ra = document.getElementById("u_river_action");

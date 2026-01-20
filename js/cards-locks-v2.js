@@ -83,7 +83,9 @@ export function limpiarTodasLasCartas() {
   // ✅ limpiar selects de cartas
   ids.forEach((id) => {
     const el = document.getElementById(id);
-    if (el) el.value = "";
+    if (!el) return;
+    el.value = "";
+    el.dispatchEvent(new Event("change", { bubbles: true }));
   });
 
   // ✅ reset extras opcionales (no rompe si no existen)
@@ -120,4 +122,3 @@ document.addEventListener("change", (e) => {
   ]);
   if (watched.has(id)) updateCardOptionLocks();
 });
-
