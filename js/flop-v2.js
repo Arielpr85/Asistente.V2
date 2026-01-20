@@ -7,7 +7,7 @@ import { pickPostflopActionV2, formatAction } from "./postflop-engine-v2.js";
 
 /* ========= FLOP: boardType alineado al JSON ========= */
 
-function classifyFlopToBoardType(flop) {
+export function classifyFlopToBoardType(flop) {
   const ranks = flop.map((c) => c.rank);
   const suits = flop.map((c) => c.suit);
 
@@ -59,6 +59,8 @@ function classifyFlopToBoardType(flop) {
   if (hasJ || hasT) return "NEUTRO_SECO";
   return "DEFENSIVO_SECO";
 }
+
+window.classifyFlopToBoardType = classifyFlopToBoardType;
 
 /* ========= Snapshot (nuevo) -> handTier/outs/blockers ========= */
 
@@ -220,4 +222,3 @@ export function initFlopV2() {
     el?.addEventListener("change", () => calcularPostflopV2());
   });
 }
-

@@ -321,7 +321,7 @@ export function getDefaultPostflopTestSuiteV2() {
 
   t.push(
     mk(
-      "OOP FLOP MONOCOLOR + MEDIA => BET 33 (simplify)",
+      "OOP FLOP MONOCOLOR + MEDIA => CHECK_CALL",
       baseCtx({
         pos: "OOP",
         street: "FLOP",
@@ -329,14 +329,14 @@ export function getDefaultPostflopTestSuiteV2() {
         handTier: "MEDIA",
         outs: 0,
       }),
-      { ruleId: "OOP_F_PAIRED_MONO_SIMPLIFY", action: "BET", size: 33 }
+      { ruleId: "OOP_F_MEDIA_XC", action: "CHECK_CALL" }
     )
   );
 
   // ---------- IP TURN ----------
   t.push(
     mk(
-      "IP TURN MUY_FUERTE => BET 75",
+      "IP TURN MUY_FUERTE => BET 50 (neutral static)",
       (() => {
         const c = baseCtx({
           pos: "IP",
@@ -347,49 +347,56 @@ export function getDefaultPostflopTestSuiteV2() {
         });
         return c;
       })(),
-      { ruleId: "IP_T_MONSTER", action: "BET", size: 75 }
+      { ruleId: "IP_T_NEU_SECO_STATIC_STRONG_OR_DRAW", action: "BET", size: 50 }
     )
   );
 
   t.push(
     mk(
-      "IP TURN heroCompletedDraw=true => BET 75",
+      "IP TURN heroCompletedDraw=true (ofensivo coord dinámico) => BET 75",
       (() => {
         const c = baseCtx({
           pos: "IP",
           street: "TURN",
-          boardType: "NEUTRO_SECO",
+          boardType: "OFENSIVO_COORD",
           handTier: "MEDIA",
           outs: 0,
         });
         c.heroCompletedDraw = true;
+        c.flopAction = "BET";
+        c.turnDynamic = "AGGRESSOR";
         return c;
       })(),
-      { ruleId: "IP_T_HERO_COMPLETED", action: "BET", size: 75 }
+      { ruleId: "IP_T_OF_COORD_DYNAMIC_VALUE_COMPLETED", action: "BET", size: 75 }
     )
   );
 
   t.push(
     mk(
-      "IP TURN boardCompletedDraw=true => CHECK",
+      "IP TURN boardCompletedDraw=true (ofensivo coord dinámico) => CHECK",
       (() => {
         const c = baseCtx({
           pos: "IP",
           street: "TURN",
-          boardType: "NEUTRO_SECO",
+          boardType: "OFENSIVO_COORD",
           handTier: "FUERTE",
           outs: 0,
         });
         c.boardCompletedDraw = true;
+        c.flopAction = "BET";
+        c.turnDynamic = "AGGRESSOR";
         return c;
       })(),
-      { ruleId: "IP_T_BOARD_COMPLETED_SLOW", action: "CHECK" }
+      {
+        ruleId: "IP_T_OF_COORD_DYNAMIC_BOARD_COMPLETED_CHECK",
+        action: "CHECK",
+      }
     )
   );
 
   t.push(
     mk(
-      "IP TURN turnDynamic=AGGRESSOR => BET 75",
+      "IP TURN turnDynamic=AGGRESSOR => BET 50 (neutral)",
       (() => {
         const c = baseCtx({
           pos: "IP",
@@ -401,13 +408,13 @@ export function getDefaultPostflopTestSuiteV2() {
         c.turnDynamic = "AGGRESSOR";
         return c;
       })(),
-      { ruleId: "IP_T_DYNAMIC_AGGRESSOR", action: "BET", size: 75 }
+      { ruleId: "IP_T_NEU_SECO_DYNAMIC_AGGRESSOR", action: "BET", size: 50 }
     )
   );
 
   t.push(
     mk(
-      "IP TURN turnDynamic=DEFENDER + FUERTE => BET 50",
+      "IP TURN turnDynamic=DEFENDER + FUERTE => CHECK (neutral)",
       (() => {
         const c = baseCtx({
           pos: "IP",
@@ -419,13 +426,13 @@ export function getDefaultPostflopTestSuiteV2() {
         c.turnDynamic = "DEFENDER";
         return c;
       })(),
-      { ruleId: "IP_T_DYNAMIC_DEFENDER_STRONG", action: "BET", size: 50 }
+      { ruleId: "IP_T_NEU_SECO_DYNAMIC_DEFENDER", action: "CHECK" }
     )
   );
 
   t.push(
     mk(
-      "IP TURN turnDynamic=DEFENDER + AIRE => CHECK",
+      "IP TURN turnDynamic=DEFENDER + AIRE => CHECK (neutral)",
       (() => {
         const c = baseCtx({
           pos: "IP",
@@ -437,7 +444,7 @@ export function getDefaultPostflopTestSuiteV2() {
         c.turnDynamic = "DEFENDER";
         return c;
       })(),
-      { ruleId: "IP_T_DYNAMIC_DEFENDER_CHECK", action: "CHECK" }
+      { ruleId: "IP_T_NEU_SECO_DYNAMIC_DEFENDER", action: "CHECK" }
     )
   );
 
@@ -787,3 +794,94 @@ export function runPostflopTestsV2({ showAll = true } = {}) {
 
 // Por comodidad desde consola:
 window.runPostflopTestsV2 = runPostflopTestsV2;
+
+// ===============================
+// ✅ RUNNER ESPECÍFICO (CON CARTAS REALES)
+// Usa buildHandSnapshot + classifyFlopToBoardType
+// ===============================
+export function runCardScenarioTestsV2({ showAll = true } = {}) {
+  requireRulesLoaded();
+
+  if (typeof window.buildHandSnapshot !== "function") {
+    throw new Error("[tests] buildHandSnapshot no está disponible en window.");
+  }
+  if (typeof window.classifyFlopToBoardType !== "function") {
+    throw new Error("[tests] classifyFlopToBoardType no está disponible en window.");
+  }
+
+  const c = (rank, suit) => ({ rank, suit });
+
+  const scenarios = [
+    {
+      name: "IP RIVER: QJ con river J -> par de J (media) = CHECK",
+      pos: "IP",
+      hero: [c("Q", "s"), c("J", "h")],
+      flop: [c("9", "d"), c("7", "d"), c("8", "d")],
+      turn: c("5", "d"),
+      river: c("J", "c"),
+      expected: { action: "CHECK" },
+    },
+    {
+      name: "IP RIVER: QJ con river Q -> par de Q (fuerte) = BET 75",
+      pos: "IP",
+      hero: [c("Q", "s"), c("J", "h")],
+      flop: [c("9", "d"), c("7", "d"), c("8", "d")],
+      turn: c("5", "d"),
+      river: c("Q", "c"),
+      expected: { action: "BET", size: 75 },
+    },
+  ];
+
+  const rows = [];
+  let pass = 0;
+  let fail = 0;
+
+  for (const sc of scenarios) {
+    const board = [...sc.flop, sc.turn, sc.river];
+    const snap = window.buildHandSnapshot(sc.hero, board);
+    const boardType = window.classifyFlopToBoardType(sc.flop);
+
+    const ctx = {
+      pos: sc.pos,
+      street: "RIVER",
+      boardType,
+      handTier: snap.handTier,
+      outs: snap.outs,
+      villainProfile: "DEFAULT",
+      flopAction: "BET",
+      flopSize: 33,
+      flopPlan: "CBET_RANGE",
+      turnDynamic: "STATIC",
+      heroCompletedDraw: false,
+      boardCompletedDraw: false,
+      hasBlockersForBluff: snap.hasBlockersForBluff,
+    };
+
+    const act = pickPostflopActionV2(AppState.postflopRules, ctx);
+    const res = matchExpected(act, sc.expected);
+    const ok = res.ok;
+
+    if (ok) pass++;
+    else fail++;
+
+    rows.push({
+      ok: ok ? "✅" : "❌",
+      name: sc.name,
+      handTier: snap.handTier,
+      expected_action: sc.expected.action ?? "",
+      got_action: act.action ?? "",
+      expected_size: sc.expected.size ?? "",
+      got_size: act.size ?? "",
+      why: ok ? "" : res.why,
+    });
+  }
+
+  const toShow = showAll ? rows : rows.filter((r) => r.ok === "❌");
+  console.table(toShow);
+  console.log(
+    `[card-tests-v2] Total: ${scenarios.length} | PASS: ${pass} | FAIL: ${fail}`
+  );
+  return { total: scenarios.length, pass, fail, rows };
+}
+
+window.runCardScenarioTestsV2 = runCardScenarioTestsV2;

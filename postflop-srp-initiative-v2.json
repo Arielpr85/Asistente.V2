@@ -1,8 +1,8 @@
 {
   "meta": {
     "name": "postflop-srp-initiative-v2",
-    "version": "1.1.0",
-    "notes": "Single Raised Pot con iniciativa. Ramas IP y OOP. Reglas determinísticas (sin MIX). Incluye soporte para flopWentCheckCheck, flopAction y villainProfile en spots clave."
+    "version": "1.2.0",
+    "notes": "Single Raised Pot con iniciativa. Ramas IP y OOP. Reglas determinísticas (sin MIX). Turn por boardType alineado a estrategia."
   },
   "rulesets": {
     "IP": {
@@ -260,32 +260,369 @@
 
       "TURN": [
         {
-          "id": "IP_T_MONSTER_ANY",
+          "id": "IP_T_OF_COORD_DELAYED_CBET_ANY",
           "priority": 5,
-          "when": { "eq": ["handTier", "MUY_FUERTE"] },
+          "when": {
+            "all": [
+              { "eq": ["boardType", "OFENSIVO_COORD"] },
+              { "eq": ["flopAction", "CHECK"] }
+            ]
+          },
+          "do": {
+            "action": "BET",
+            "size": 75,
+            "plan": "DELAYED_CBET",
+            "reason": "Ofensivo coordinado: doble check flop -> podemos apostar cualquier turn"
+          }
+        },
+        {
+          "id": "IP_T_OF_COORD_DYNAMIC_VALUE_COMPLETED",
+          "priority": 10,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "OFENSIVO_COORD"] },
+              { "in": ["turnDynamic", ["AGGRESSOR", "DEFENDER"]] },
+              { "eq": ["flopAction", "BET"] },
+              { "eq": ["heroCompletedDraw", true] }
+            ]
+          },
           "do": {
             "action": "BET",
             "size": 75,
             "plan": "VALUE",
-            "reason": "Turn: valor muy fuerte -> apostar grande"
+            "reason": "Ofensivo coordinado dinámico: completamos draw -> value"
+          }
+        },
+        {
+          "id": "IP_T_OF_COORD_DYNAMIC_BOARD_COMPLETED_CHECK",
+          "priority": 11,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "OFENSIVO_COORD"] },
+              { "in": ["turnDynamic", ["AGGRESSOR", "DEFENDER"]] },
+              { "eq": ["flopAction", "BET"] },
+              { "eq": ["boardCompletedDraw", true] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Ofensivo coordinado dinámico: se completa draw del board -> check"
+          }
+        },
+        {
+          "id": "IP_T_OF_COORD_STATIC_VALUE_OR_DRAW",
+          "priority": 12,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "OFENSIVO_COORD"] },
+              { "eq": ["turnDynamic", "STATIC"] },
+              { "eq": ["flopAction", "BET"] },
+              {
+                "any": [
+                  { "in": ["handTier", ["MUY_FUERTE", "FUERTE"]] },
+                  { "gte": ["outs", 4] }
+                ]
+              }
+            ]
+          },
+          "do": {
+            "action": "BET",
+            "size": 75,
+            "plan": "BARREL",
+            "reason": "Ofensivo coordinado estático: continuar con valor/proyectos"
+          }
+        },
+        {
+          "id": "IP_T_OF_COORD_STATIC_CHECK",
+          "priority": 13,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "OFENSIVO_COORD"] },
+              { "eq": ["turnDynamic", "STATIC"] },
+              { "eq": ["flopAction", "BET"] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Ofensivo coordinado estático: check con lo que no continúa"
           }
         },
 
         {
-          "id": "IP_T_HERO_COMPLETED",
-          "priority": 10,
-          "when": { "eq": ["heroCompletedDraw", true] },
+          "id": "IP_T_OF_SECO_STATIC_BET",
+          "priority": 20,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "OFENSIVO_SECO"] },
+              { "eq": ["turnDynamic", "STATIC"] },
+              { "in": ["handTier", ["MUY_FUERTE", "FUERTE", "AIRE"]] }
+            ]
+          },
           "do": {
             "action": "BET",
             "size": 75,
-            "plan": "VALUE",
-            "reason": "Turn: completamos proyecto -> value grande"
+            "plan": "PRESSURE",
+            "reason": "Ofensivo seco estático: bet grande con fuertes, semibluff y aire"
+          }
+        },
+        {
+          "id": "IP_T_OF_SECO_STATIC_CHECK",
+          "priority": 21,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "OFENSIVO_SECO"] },
+              { "eq": ["turnDynamic", "STATIC"] },
+              { "eq": ["handTier", "MEDIA"] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Ofensivo seco estático: check con manos medias/SD"
+          }
+        },
+        {
+          "id": "IP_T_OF_SECO_DYNAMIC_BET",
+          "priority": 22,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "OFENSIVO_SECO"] },
+              { "in": ["turnDynamic", ["AGGRESSOR", "DEFENDER"]] },
+              {
+                "any": [
+                  { "in": ["handTier", ["MUY_FUERTE", "FUERTE"]] },
+                  { "gte": ["outs", 4] }
+                ]
+              }
+            ]
+          },
+          "do": {
+            "action": "BET",
+            "size": 75,
+            "plan": "PRESSURE",
+            "reason": "Ofensivo seco dinámico: bet grande con fuertes o semifarol (4+ outs)"
+          }
+        },
+        {
+          "id": "IP_T_OF_SECO_DYNAMIC_CHECK",
+          "priority": 23,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "OFENSIVO_SECO"] },
+              { "in": ["turnDynamic", ["AGGRESSOR", "DEFENDER"]] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Ofensivo seco dinámico: check con medias/SD/aire"
+          }
+        },
+
+        {
+          "id": "IP_T_DEF_STATIC_BET",
+          "priority": 30,
+          "when": {
+            "all": [
+              { "in": ["boardType", ["DEFENSIVO_SECO", "DEFENSIVO_COORD"]] },
+              { "eq": ["turnDynamic", "STATIC"] },
+              { "eq": ["flopAction", "BET"] }
+            ]
+          },
+          "do": {
+            "action": "BET",
+            "size": 75,
+            "plan": "BARREL",
+            "reason": "Defensivo estático: seguir con todo lo que beteó flop"
+          }
+        },
+        {
+          "id": "IP_T_DEF_STATIC_CHECK",
+          "priority": 31,
+          "when": {
+            "all": [
+              { "in": ["boardType", ["DEFENSIVO_SECO", "DEFENSIVO_COORD"]] },
+              { "eq": ["turnDynamic", "STATIC"] },
+              { "eq": ["flopAction", "CHECK"] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Defensivo estático: mantener check con lo que chequeó flop"
+          }
+        },
+        {
+          "id": "IP_T_DEF_DYNAMIC_AGGRESSOR",
+          "priority": 32,
+          "when": {
+            "all": [
+              { "in": ["boardType", ["DEFENSIVO_SECO", "DEFENSIVO_COORD"]] },
+              { "eq": ["turnDynamic", "AGGRESSOR"] }
+            ]
+          },
+          "do": {
+            "action": "BET",
+            "size": 75,
+            "plan": "PRESSURE",
+            "reason": "Defensivo dinámico: atacar si favorece al agresor"
+          }
+        },
+        {
+          "id": "IP_T_DEF_DYNAMIC_DEFENDER",
+          "priority": 33,
+          "when": {
+            "all": [
+              { "in": ["boardType", ["DEFENSIVO_SECO", "DEFENSIVO_COORD"]] },
+              { "eq": ["turnDynamic", "DEFENDER"] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Defensivo dinámico: pasar si favorece al defensor"
+          }
+        },
+
+        {
+          "id": "IP_T_NEU_SECO_STATIC_STRONG_OR_DRAW",
+          "priority": 40,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "NEUTRO_SECO"] },
+              { "eq": ["turnDynamic", "STATIC"] },
+              {
+                "any": [
+                  { "eq": ["handTier", "FUERTE"] },
+                  { "gte": ["outs", 4] }
+                ]
+              }
+            ]
+          },
+          "do": {
+            "action": "BET",
+            "size": 50,
+            "plan": "THIN_VALUE_OR_SEMI",
+            "reason": "Neutro seco estático: bet 50% con fuerte o semifarol (4+ outs)"
+          }
+        },
+        {
+          "id": "IP_T_NEU_SECO_STATIC_CHECK",
+          "priority": 41,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "NEUTRO_SECO"] },
+              { "eq": ["turnDynamic", "STATIC"] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Neutro seco estático: check con medias/SD/aire"
+          }
+        },
+        {
+          "id": "IP_T_NEU_SECO_DYNAMIC_AGGRESSOR",
+          "priority": 42,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "NEUTRO_SECO"] },
+              { "eq": ["turnDynamic", "AGGRESSOR"] }
+            ]
+          },
+          "do": {
+            "action": "BET",
+            "size": 50,
+            "plan": "PRESSURE",
+            "reason": "Neutro seco dinámico: atacar si favorece al agresor"
+          }
+        },
+        {
+          "id": "IP_T_NEU_SECO_DYNAMIC_DEFENDER",
+          "priority": 43,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "NEUTRO_SECO"] },
+              { "eq": ["turnDynamic", "DEFENDER"] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Neutro seco dinámico: pasar si favorece al defensor"
+          }
+        },
+
+        {
+          "id": "IP_T_NEU_COORD_STATIC_BET",
+          "priority": 50,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "NEUTRO_COORD"] },
+              { "eq": ["turnDynamic", "STATIC"] },
+              { "eq": ["flopAction", "BET"] }
+            ]
+          },
+          "do": {
+            "action": "BET",
+            "size": 75,
+            "plan": "BARREL",
+            "reason": "Neutro coordinado estático: seguir con lo que beteó flop"
+          }
+        },
+        {
+          "id": "IP_T_NEU_COORD_STATIC_CHECK",
+          "priority": 51,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "NEUTRO_COORD"] },
+              { "eq": ["turnDynamic", "STATIC"] },
+              { "eq": ["flopAction", "CHECK"] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Neutro coordinado estático: mantener check con lo que chequeó flop"
+          }
+        },
+        {
+          "id": "IP_T_NEU_COORD_DYNAMIC_AGGRESSOR",
+          "priority": 52,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "NEUTRO_COORD"] },
+              { "eq": ["turnDynamic", "AGGRESSOR"] }
+            ]
+          },
+          "do": {
+            "action": "BET",
+            "size": 75,
+            "plan": "PRESSURE",
+            "reason": "Neutro coordinado dinámico: atacar si favorece al agresor"
+          }
+        },
+        {
+          "id": "IP_T_NEU_COORD_DYNAMIC_DEFENDER",
+          "priority": 53,
+          "when": {
+            "all": [
+              { "eq": ["boardType", "NEUTRO_COORD"] },
+              { "eq": ["turnDynamic", "DEFENDER"] }
+            ]
+          },
+          "do": {
+            "action": "CHECK",
+            "plan": "CONTROL",
+            "reason": "Neutro coordinado dinámico: pasar si favorece al defensor"
           }
         },
 
         {
           "id": "IP_T_MONO_VALUE",
-          "priority": 20,
+          "priority": 60,
           "when": {
             "all": [
               { "eq": ["boardType", "MONOCOLOR"] },
@@ -301,7 +638,7 @@
         },
         {
           "id": "IP_T_MONO_BLUFF_SEMI",
-          "priority": 21,
+          "priority": 61,
           "when": {
             "all": [
               { "eq": ["boardType", "MONOCOLOR"] },
@@ -322,127 +659,12 @@
         },
         {
           "id": "IP_T_MONO_CHECK",
-          "priority": 22,
+          "priority": 62,
           "when": { "eq": ["boardType", "MONOCOLOR"] },
           "do": {
             "action": "CHECK",
             "plan": "CONTROL",
             "reason": "Monocolor turn: check con valor devaluado / medias no vulnerables"
-          }
-        },
-
-        {
-          "id": "IP_T_OF_COORD_DELAYED_CBET_ANY",
-          "priority": 30,
-          "when": {
-            "all": [
-              { "eq": ["boardType", "OFENSIVO_COORD"] },
-              { "eq": ["flopAction", "CHECK"] }
-            ]
-          },
-          "do": {
-            "action": "BET",
-            "size": 75,
-            "plan": "DELAYED_CBET",
-            "reason": "Ofensivo coordinado: check flop -> podemos apostar cualquier turn"
-          }
-        },
-
-        {
-          "id": "IP_T_STATIC_REPEAT_FLOP_BET",
-          "priority": 40,
-          "when": {
-            "all": [
-              { "eq": ["turnDynamic", "STATIC"] },
-              { "eq": ["flopAction", "BET"] }
-            ]
-          },
-          "do": {
-            "action": "BET",
-            "size": 75,
-            "plan": "BARREL",
-            "reason": "Turn estático: si cbet flop -> continuar apostando (mantener línea)"
-          }
-        },
-        {
-          "id": "IP_T_STATIC_REPEAT_FLOP_CHECK",
-          "priority": 41,
-          "when": {
-            "all": [
-              { "eq": ["turnDynamic", "STATIC"] },
-              { "eq": ["flopAction", "CHECK"] }
-            ]
-          },
-          "do": {
-            "action": "CHECK",
-            "plan": "CONTROL",
-            "reason": "Turn estático: si check flop -> mantener check (mantener línea)"
-          }
-        },
-
-        {
-          "id": "IP_T_DYNAMIC_AGGRESSOR_PRESSURE",
-          "priority": 50,
-          "when": { "eq": ["turnDynamic", "AGGRESSOR"] },
-          "do": {
-            "action": "BET",
-            "size": 75,
-            "plan": "PRESSURE",
-            "reason": "Turn dinámico favorable al agresor: presionar"
-          }
-        },
-
-        {
-          "id": "IP_T_DYNAMIC_DEFENDER_CHECK",
-          "priority": 61,
-          "when": { "eq": ["turnDynamic", "DEFENDER"] },
-          "do": {
-            "action": "CHECK",
-            "plan": "CONTROL",
-            "reason": "Turn dinámico favorece al defensor: frenar con medias/aire"
-          }
-        },
-
-        {
-          "id": "IP_T_NEU_SECO_STRONG_OR_DRAW",
-          "priority": 70,
-          "when": {
-            "all": [
-              { "eq": ["boardType", "NEUTRO_SECO"] },
-              {
-                "any": [
-                  { "eq": ["handTier", "FUERTE"] },
-                  { "gte": ["outs", 4] }
-                ]
-              }
-            ]
-          },
-          "do": {
-            "action": "BET",
-            "size": 50,
-            "plan": "THIN_VALUE_OR_SEMI",
-            "reason": "Neutro seco turn: bet 50% con fuerte o semifarol (4+ outs)"
-          }
-        },
-        {
-          "id": "IP_T_NEU_SECO_CHECK",
-          "priority": 71,
-          "when": { "eq": ["boardType", "NEUTRO_SECO"] },
-          "do": {
-            "action": "CHECK",
-            "plan": "CONTROL",
-            "reason": "Neutro seco turn: check con medias/aire"
-          }
-        },
-
-        {
-          "id": "IP_T_BOARD_COMPLETED_DRAW_SLOW",
-          "priority": 15,
-          "when": { "eq": ["boardCompletedDraw", true] },
-          "do": {
-            "action": "CHECK",
-            "plan": "CONTROL",
-            "reason": "Turn: se completa draw del board -> frenar con rango vulnerable"
           }
         },
 
