@@ -27,7 +27,7 @@ const RANK_VAL = {
   A: 14,
 };
 
-const GOOD_KICKER_MIN = RANK_VAL.Q;
+const TOP_PAIR_STRONG_MIN = RANK_VAL.Q;
 
 function getRankValue(rank) {
   return RANK_VAL[rank] || 0;
@@ -67,14 +67,13 @@ function isOverpair(heroCards, boardCards) {
   return heroVal > top;
 }
 
-function hasTopPairGoodKicker(heroCards, boardCards) {
+function hasStrongTopPair(heroCards, boardCards) {
   if (!heroCards || heroCards.length !== 2) return false;
   const { top } = getTopBoardRanks(boardCards);
   if (!top) return false;
   const heroVals = heroCards.map((c) => getRankValue(c?.rank));
   if (!heroVals.includes(top)) return false;
-  const kicker = heroVals.find((v) => v !== top) || 0;
-  return kicker >= GOOD_KICKER_MIN;
+  return top >= TOP_PAIR_STRONG_MIN;
 }
 
 function hasTopTwoPair(heroCards, boardCards) {
@@ -121,7 +120,7 @@ export function buildHandSnapshot(heroCards, boardCards) {
   let handTier = "AIRE";
 
   const isTopTwo = hasTopTwoPair(heroCards, boardCards);
-  const isTopPairGood = hasTopPairGoodKicker(heroCards, boardCards);
+  const isTopPairStrong = hasStrongTopPair(heroCards, boardCards);
   const isOver = isOverpair(heroCards, boardCards);
 
   // MUY_FUERTE (top two pair+)
@@ -136,8 +135,8 @@ export function buildHandSnapshot(heroCards, boardCards) {
   ) {
     handTier = "MUY_FUERTE";
   }
-  // FUERTE (TPGK / two pair débil / overpair)
-  else if (madeCategory === "two_pair" || isTopPairGood || isOver) {
+  // FUERTE (top pair alta / two pair débil / overpair)
+  else if (madeCategory === "two_pair" || isTopPairStrong || isOver) {
     handTier = "FUERTE";
   }
   // MEDIA (pares que no entran en fuerte)
@@ -186,4 +185,4 @@ export function buildHandSnapshot(heroCards, boardCards) {
   };
 }
 
-
+window.buildHandSnapshot = buildHandSnapshot;
