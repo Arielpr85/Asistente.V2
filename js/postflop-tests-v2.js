@@ -321,7 +321,7 @@ export function getDefaultPostflopTestSuiteV2() {
 
   t.push(
     mk(
-      "OOP FLOP MONOCOLOR + MEDIA => BET 33 (simplify)",
+      "OOP FLOP MONOCOLOR + MEDIA => CHECK_CALL",
       baseCtx({
         pos: "OOP",
         street: "FLOP",
@@ -329,14 +329,14 @@ export function getDefaultPostflopTestSuiteV2() {
         handTier: "MEDIA",
         outs: 0,
       }),
-      { ruleId: "OOP_F_PAIRED_MONO_SIMPLIFY", action: "BET", size: 33 }
+      { ruleId: "OOP_F_MEDIA_XC", action: "CHECK_CALL" }
     )
   );
 
   // ---------- IP TURN ----------
   t.push(
     mk(
-      "IP TURN MUY_FUERTE => BET 75",
+      "IP TURN MUY_FUERTE => BET 50 (neutral static)",
       (() => {
         const c = baseCtx({
           pos: "IP",
@@ -347,49 +347,56 @@ export function getDefaultPostflopTestSuiteV2() {
         });
         return c;
       })(),
-      { ruleId: "IP_T_MONSTER", action: "BET", size: 75 }
+      { ruleId: "IP_T_NEU_SECO_STATIC_STRONG_OR_DRAW", action: "BET", size: 50 }
     )
   );
 
   t.push(
     mk(
-      "IP TURN heroCompletedDraw=true => BET 75",
+      "IP TURN heroCompletedDraw=true (ofensivo coord dinámico) => BET 75",
       (() => {
         const c = baseCtx({
           pos: "IP",
           street: "TURN",
-          boardType: "NEUTRO_SECO",
+          boardType: "OFENSIVO_COORD",
           handTier: "MEDIA",
           outs: 0,
         });
         c.heroCompletedDraw = true;
+        c.flopAction = "BET";
+        c.turnDynamic = "AGGRESSOR";
         return c;
       })(),
-      { ruleId: "IP_T_HERO_COMPLETED", action: "BET", size: 75 }
+      { ruleId: "IP_T_OF_COORD_DYNAMIC_VALUE_COMPLETED", action: "BET", size: 75 }
     )
   );
 
   t.push(
     mk(
-      "IP TURN boardCompletedDraw=true => CHECK",
+      "IP TURN boardCompletedDraw=true (ofensivo coord dinámico) => CHECK",
       (() => {
         const c = baseCtx({
           pos: "IP",
           street: "TURN",
-          boardType: "NEUTRO_SECO",
+          boardType: "OFENSIVO_COORD",
           handTier: "FUERTE",
           outs: 0,
         });
         c.boardCompletedDraw = true;
+        c.flopAction = "BET";
+        c.turnDynamic = "AGGRESSOR";
         return c;
       })(),
-      { ruleId: "IP_T_BOARD_COMPLETED_SLOW", action: "CHECK" }
+      {
+        ruleId: "IP_T_OF_COORD_DYNAMIC_BOARD_COMPLETED_CHECK",
+        action: "CHECK",
+      }
     )
   );
 
   t.push(
     mk(
-      "IP TURN turnDynamic=AGGRESSOR => BET 75",
+      "IP TURN turnDynamic=AGGRESSOR => BET 50 (neutral)",
       (() => {
         const c = baseCtx({
           pos: "IP",
@@ -401,13 +408,13 @@ export function getDefaultPostflopTestSuiteV2() {
         c.turnDynamic = "AGGRESSOR";
         return c;
       })(),
-      { ruleId: "IP_T_DYNAMIC_AGGRESSOR", action: "BET", size: 75 }
+      { ruleId: "IP_T_NEU_SECO_DYNAMIC_AGGRESSOR", action: "BET", size: 50 }
     )
   );
 
   t.push(
     mk(
-      "IP TURN turnDynamic=DEFENDER + FUERTE => BET 50",
+      "IP TURN turnDynamic=DEFENDER + FUERTE => CHECK (neutral)",
       (() => {
         const c = baseCtx({
           pos: "IP",
@@ -419,13 +426,13 @@ export function getDefaultPostflopTestSuiteV2() {
         c.turnDynamic = "DEFENDER";
         return c;
       })(),
-      { ruleId: "IP_T_DYNAMIC_DEFENDER_STRONG", action: "BET", size: 50 }
+      { ruleId: "IP_T_NEU_SECO_DYNAMIC_DEFENDER", action: "CHECK" }
     )
   );
 
   t.push(
     mk(
-      "IP TURN turnDynamic=DEFENDER + AIRE => CHECK",
+      "IP TURN turnDynamic=DEFENDER + AIRE => CHECK (neutral)",
       (() => {
         const c = baseCtx({
           pos: "IP",
@@ -437,7 +444,7 @@ export function getDefaultPostflopTestSuiteV2() {
         c.turnDynamic = "DEFENDER";
         return c;
       })(),
-      { ruleId: "IP_T_DYNAMIC_DEFENDER_CHECK", action: "CHECK" }
+      { ruleId: "IP_T_NEU_SECO_DYNAMIC_DEFENDER", action: "CHECK" }
     )
   );
 
