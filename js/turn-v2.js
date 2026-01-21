@@ -135,6 +135,32 @@ function isBigOvercardTurn(flop3, turnCard) {
   );
 }
 
+function isTurnTextureDynamic(flop3, turnCard) {
+  if (!flop3 || flop3.length !== 3 || !turnCard?.rank) return false;
+  const turnVal = RANK_VAL[turnCard.rank] || 0;
+  if (!turnVal) return false;
+
+  const flopVals = flop3
+    .map((c) => RANK_VAL[c?.rank] || 0)
+    .filter(Boolean);
+
+  for (let i = 0; i < flopVals.length; i++) {
+    for (let j = i + 1; j < flopVals.length; j++) {
+      const minVal = Math.min(turnVal, flopVals[i], flopVals[j]);
+      const maxVal = Math.max(turnVal, flopVals[i], flopVals[j]);
+      if (maxVal - minVal <= 4) return true;
+    }
+  }
+
+  const suits = flop3.map((c) => c?.suit).filter(Boolean);
+  const suitCounts = suits.reduce(
+    (acc, s) => ((acc[s] = (acc[s] || 0) + 1), acc),
+    {},
+  );
+  const maxSuit = Math.max(0, ...Object.values(suitCounts));
+  return maxSuit <= 1 && suits.includes(turnCard.suit);
+}
+
 function heroHasTopPair(heroCards, boardCards) {
   // Top pair = el héroe tiene una pareja con la carta más alta del board
   const top = maxBoardRank(boardCards);
@@ -282,7 +308,10 @@ export function calcularTurnV2() {
     const semi = engineCtx.outs >= 4; // guía: semifarol 4+ outs
 
     const isStatic = engineCtx.turnDynamic === "STATIC";
-    const isDynamic = engineCtx.turnDynamic !== "STATIC"; // AGGRESSOR (en tu modelo actual)
+    const isDynamic =
+      engineCtx.turnDynamic !== "STATIC" ||
+      isTurnTextureDynamic(flopCtx.flop, turn);
+    const isScary = isBigOvercardTurn(flopCtx.flop, turn);
 
     // Guía OFENSIVO SECO - TURN:
     // Estático: BET grande con fuerte/semifarol/aire; CHECK con manos medias (SD)
@@ -300,6 +329,15 @@ export function calcularTurnV2() {
       const made = snapshotTurn?.madeCategory || "none";
       const isPair = made === "pair";
       const isHigh = made === "high_card";
+
+      if (medium && isScary && !strong) {
+        act.action = "CHECK";
+        act.size = null;
+        act.plan = "SD_CONTROL";
+        act.reason =
+          "Ofensivo seco (turn scary): mano media empeora -> CHECK (guía).";
+        act.ruleId = "OVERRIDE_ODRY_TURN_SCARY_MEDIUM_CHECK";
+      }
 
       // Dinámico (guía): CHECK con mano media y con aire.
       // Permitimos BET grande solo si: strong (valor real) o semi (outs>=4).
