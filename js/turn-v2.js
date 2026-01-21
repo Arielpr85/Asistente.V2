@@ -126,13 +126,30 @@ function maxBoardRank(cards) {
   return m;
 }
 
-function isBigOvercardTurn(flop3, turnCard) {
+function isTurnTextureDynamic(flop3, turnCard) {
   if (!flop3 || flop3.length !== 3 || !turnCard?.rank) return false;
-  const flopRanks = flop3.map((c) => c.rank);
-  return (
-    ["A", "K", "Q"].includes(turnCard.rank) &&
-    !flopRanks.includes(turnCard.rank)
+  const turnVal = RANK_VAL[turnCard.rank] || 0;
+  if (!turnVal) return false;
+
+  const flopVals = flop3
+    .map((c) => RANK_VAL[c?.rank] || 0)
+    .filter(Boolean);
+
+  for (let i = 0; i < flopVals.length; i++) {
+    for (let j = i + 1; j < flopVals.length; j++) {
+      const minVal = Math.min(turnVal, flopVals[i], flopVals[j]);
+      const maxVal = Math.max(turnVal, flopVals[i], flopVals[j]);
+      if (maxVal - minVal <= 4) return true;
+    }
+  }
+
+  const suits = flop3.map((c) => c?.suit).filter(Boolean);
+  const suitCounts = suits.reduce(
+    (acc, s) => ((acc[s] = (acc[s] || 0) + 1), acc),
+    {},
   );
+  const maxSuit = Math.max(0, ...Object.values(suitCounts));
+  return maxSuit <= 1 && suits.includes(turnCard.suit);
 }
 
 function heroHasTopPair(heroCards, boardCards) {
@@ -148,6 +165,22 @@ function heroHasTopPair(heroCards, boardCards) {
   return heroRanks.some((r) => targetRanks.has(r));
 }
 
+function heroHasTopTwoPair(heroCards, boardCards) {
+  const vals = (boardCards || [])
+    .map((c) => RANK_VAL[c?.rank] || 0)
+    .filter(Boolean)
+    .sort((a, b) => b - a);
+  const unique = [...new Set(vals)];
+  const top = unique[0] || 0;
+  const second = unique[1] || 0;
+  if (!top || !second) return false;
+  const topRank = Object.keys(RANK_VAL).find((k) => RANK_VAL[k] === top);
+  const secondRank = Object.keys(RANK_VAL).find((k) => RANK_VAL[k] === second);
+  if (!topRank || !secondRank) return false;
+  const heroRanks = (heroCards || []).map((c) => c.rank);
+  return heroRanks.includes(topRank) && heroRanks.includes(secondRank);
+}
+
 function isPocketOverpair(heroCards, boardCards) {
   // Overpair = pocket pair del héroe > carta más alta del board
   if (!heroCards || heroCards.length !== 2) return false;
@@ -159,59 +192,87 @@ function isPocketOverpair(heroCards, boardCards) {
   return heroVal > top;
 }
 
-function isStrongMade(snapshotTurn, heroCards, boardCards, flop3, turnCard) {
+function heroTopPairKickerValue(heroCards, boardCards) {
+  if (!heroHasTopPair(heroCards, boardCards)) return 0;
+  const top = maxBoardRank(boardCards);
+  const heroVals = (heroCards || []).map((c) => RANK_VAL[c?.rank] || 0);
+  const kickerVals = heroVals.filter((v) => v !== top);
+  return Math.max(0, ...kickerVals);
+}
+
+function heroHasSecondPair(heroCards, boardCards) {
+  const vals = (boardCards || [])
+    .map((c) => RANK_VAL[c?.rank] || 0)
+    .filter(Boolean)
+    .sort((a, b) => b - a);
+  const unique = [...new Set(vals)];
+  const second = unique[1] || 0;
+  if (!second) return false;
+  const secondRank = Object.keys(RANK_VAL).find((k) => RANK_VAL[k] === second);
+  if (!secondRank) return false;
+  const heroRanks = (heroCards || []).map((c) => c.rank);
+  return heroRanks.includes(secondRank);
+}
+
+function isUnderpair(heroCards, boardCards) {
+  if (!heroCards || heroCards.length !== 2) return false;
+  const r1 = heroCards[0]?.rank;
+  const r2 = heroCards[1]?.rank;
+  if (!r1 || !r2 || r1 !== r2) return false;
+  const heroVal = RANK_VAL[r1] || 0;
+  const top = maxBoardRank(boardCards);
+  return heroVal > 0 && heroVal < top;
+}
+
+function isValidSemiBluff(snapshotTurn) {
+  const flags = snapshotTurn?.flags || {};
+  const outs = calcOutsFromSnapshot(snapshotTurn);
+  return (
+    outs >= 4 ||
+    flags.hasGutshot ||
+    flags.hasOESD ||
+    flags.hasFlushDraw
+  );
+}
+
+function classifyOffensiveDryTurnStrength(
+  snapshotTurn,
+  heroCards,
+  boardCards,
+) {
   const made = snapshotTurn?.madeCategory || "none";
+  const flags = snapshotTurn?.flags || {};
+  const hasTopPair = heroHasTopPair(heroCards, boardCards);
+  const kickerVal = heroTopPairKickerValue(heroCards, boardCards);
+  const hasRedraw =
+    flags.hasFlushDraw || flags.hasGutshot || flags.hasOESD;
+
   if (
     [
-      "trips",
       "straight",
       "flush",
       "full_house",
       "quads",
       "straight_flush",
+      "trips",
     ].includes(made)
   )
-    return true;
-  if (made === "two_pair") return true;
-  if (isPocketOverpair(heroCards, boardCards)) return true;
+    return "VERY_STRONG";
+  if (made === "two_pair" && heroHasTopTwoPair(heroCards, boardCards))
+    return "VERY_STRONG";
 
-  // Top pair SOLO lo subimos a "fuerte" si el turn fue overcard grande (tipo Test 2)
-  if (
-    made === "pair" &&
-    heroHasTopPair(heroCards, boardCards) &&
-    isBigOvercardTurn(flop3, turnCard)
-  ) {
-    return true;
-  }
+  if (made === "two_pair") return "STRONG";
+  if (isPocketOverpair(heroCards, boardCards)) return "STRONG";
+  if (hasTopPair && (kickerVal >= RANK_VAL.Q || hasRedraw)) return "STRONG";
 
-  return false;
-}
+  if (!hasTopPair && isValidSemiBluff(snapshotTurn)) return "SEMI_BLUFF";
+  if (hasTopPair && hasRedraw) return "STRONG";
+  if (hasTopPair) return "MEDIUM_SD";
+  if (heroHasSecondPair(heroCards, boardCards)) return "MEDIUM_SD";
+  if (isUnderpair(heroCards, boardCards)) return "MEDIUM_SD";
+  if (isValidSemiBluff(snapshotTurn)) return "SEMI_BLUFF";
 
-function isMediumShowdown(
-  snapshotTurn,
-  heroCards,
-  boardCards,
-  flop3,
-  turnCard,
-) {
-  const made = snapshotTurn?.madeCategory || "none";
-
-  // “Mano media / SD” en ofensivo seco: top pair normal (no overcard grande), pares, etc.
-  if (made === "pair") {
-    if (
-      heroHasTopPair(heroCards, boardCards) &&
-      !isBigOvercardTurn(flop3, turnCard)
-    )
-      return true;
-    return true; // otros pares = SD en general
-  }
-
-  return false;
-}
-
-function isAir(snapshotTurn) {
-  const made = snapshotTurn?.madeCategory || "none";
-  return made === "high_card" || snapshotToHandTier(snapshotTurn) === "AIRE";
+  return "AIR";
 }
 
 export function calcularTurnV2() {
@@ -270,23 +331,19 @@ export function calcularTurnV2() {
   // ✅ OVERRIDE QUIRÚRGICO: SOLO OFENSIVO_SECO en TURN (según tu guía)
   if (engineCtx.boardType === "OFENSIVO_SECO") {
     const board4 = [...flop, turn];
-    const strong = isStrongMade(snapshotTurn, hero, board4, flopCtx.flop, turn);
-    const medium = isMediumShowdown(
+    const isStatic = engineCtx.turnDynamic === "STATIC";
+    const isDynamic =
+      engineCtx.turnDynamic !== "STATIC" ||
+      isTurnTextureDynamic(flopCtx.flop, turn);
+    const strength = classifyOffensiveDryTurnStrength(
       snapshotTurn,
       hero,
       board4,
-      flopCtx.flop,
-      turn,
     );
-    const air = isAir(snapshotTurn);
-    const semi = engineCtx.outs >= 4; // guía: semifarol 4+ outs
-
-    const isStatic = engineCtx.turnDynamic === "STATIC";
-    const isDynamic = engineCtx.turnDynamic !== "STATIC"; // AGGRESSOR (en tu modelo actual)
 
     // Guía OFENSIVO SECO - TURN:
     // Estático: BET grande con fuerte/semifarol/aire; CHECK con manos medias (SD)
-    if (isStatic && medium) {
+    if (isStatic && strength === "MEDIUM_SD") {
       act.action = "CHECK";
       act.size = null;
       act.plan = "SD_CONTROL";
@@ -297,19 +354,25 @@ export function calcularTurnV2() {
 
     // Dinámico: BET grande con fuerte o semifarol 4+ outs; CHECK con manos medias, SD y aire
     if (isDynamic) {
-      const made = snapshotTurn?.madeCategory || "none";
-      const isPair = made === "pair";
-      const isHigh = made === "high_card";
+      const allowBet =
+        strength === "VERY_STRONG" ||
+        strength === "STRONG" ||
+        strength === "SEMI_BLUFF";
 
-      // Dinámico (guía): CHECK con mano media y con aire.
-      // Permitimos BET grande solo si: strong (valor real) o semi (outs>=4).
-      if ((isPair || isHigh) && !strong && !semi) {
+      if (allowBet) {
+        act.action = "BET";
+        act.size = 75;
+        act.plan = "VALUE_OR_SEMI";
+        act.reason =
+          "Ofensivo seco (turn dinámico): valor o semifarol -> BET 75 (guía).";
+        act.ruleId = "OVERRIDE_ODRY_TURN_DYNAMIC_BET";
+      } else {
         act.action = "CHECK";
         act.size = null;
         act.plan = "SD_CONTROL";
         act.reason =
           "Ofensivo seco (turn dinámico): mano media/aire -> CHECK (guía).";
-        act.ruleId = "OVERRIDE_ODRY_TURN_DYNAMIC_PAIR_HIGH_CHECK";
+        act.ruleId = "OVERRIDE_ODRY_TURN_DYNAMIC_CHECK";
       }
     }
   }
